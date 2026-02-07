@@ -1,15 +1,7 @@
 import { useRef, useState } from 'react';
-import { LayoutGroup } from 'framer-motion';
 import HeroSection from '../sections/HeroSection';
-import EditorLetterSection from '../sections/EditorLetterSection';
-import IndexSection from '../sections/IndexSection';
-import CommentSection from '../sections/CommentSection';
-import TermsSection from '../sections/TermsSection';
-import ArticleSection from '../sections/ArticleSection';
-import ArticleDetailModal from '../sections/ArticleDetailModal';
+import TermFullscreenSection from '../sections/TermFullscreenSection';
 import TermsDetailModal from '../sections/TermsDetailModal';
-import StorySection from '../sections/StorySection';
-import SurveySection from '../sections/SurveySection';
 import OutroSection from '../sections/OutroSection';
 import FooterSection from '../sections/FooterSection';
 import GradientOverlay from '../components/dynamic-color/GradientOverlay';
@@ -22,21 +14,20 @@ import magazineData from '../data/magazineData';
  * MagazinePage 컴포넌트
  *
  * Intertext Magazine Issue No.1 전체 페이지.
- * 각 섹션 컴포넌트를 순서대로 배치한다.
- * (스크롤 스냅은 임시 해제 상태)
+ * 용어 중심 몰입형 경험 — 각 트랜서핑 용어가 풀스크린 섹션으로 표시된다.
  *
  * 동작 흐름:
  * 1. 사용자가 페이지에 진입하면 HeroSection(표지)이 보인다
- * 2. 스크롤하면 커버 이미지가 확대되며 EditorLetterSection으로 전환된다
- * 3. EditorLetterSection의 CTA 클릭 시 다음 섹션(Index)으로 스크롤 이동한다
+ * 2. 스크롤하면 8개 트랜서핑 용어가 각각 풀스크린 섹션으로 나타난다
+ * 3. 각 용어 섹션의 '자세히 보기' 클릭 시 TermsDetailModal이 열린다
+ * 4. 모든 용어를 지나면 Outro, Footer가 이어진다
  *
  * Example usage:
  * <MagazinePage />
  */
 function MagazinePage() {
-  const { intro, editorLetter, index, comments, terms, articles, stories, survey, outro, footer } = magazineData;
+  const { intro, terms, outro, footer } = magazineData;
   const outroRef = useRef(null);
-  const [selectedArticle, setSelectedArticle] = useState(null);
   const [selectedTerm, setSelectedTerm] = useState(null);
 
   return (
@@ -57,69 +48,22 @@ function MagazinePage() {
         footerText={ intro.footerText }
       />
 
-      {/* 매거진 입장 — 메인 컨텐츠 영역 */}
+      {/* 매거진 입장 — 용어 풀스크린 여정 */}
       <SectionContainer sx={ { py: 0, position: 'relative', zIndex: 2 } }>
-        {/* 2. Editor's Letter — 에디터 레터 */}
-        <EditorLetterSection
-          headline={ editorLetter.headline }
-          bodyText={ editorLetter.bodyText }
-          ctaText={ editorLetter.ctaText }
-          tag={ editorLetter.tag }
-          sx={ { mt: '-10vh', position: 'relative', zIndex: 1 } }
-        />
-
-        {/* 3. Index — 목차 */}
-        <IndexSection
-          label={ index.label }
-          headline={ index.headline }
-          items={ index.items }
-        />
-
-        {/* 4. Comments — 트랜서핑에 대한 말말말 */}
-        <CommentSection
-          sectionTitle={ comments.sectionTitle }
-          comments={ comments.comments }
-        />
-
-        {/* 5. Terms — 트랜서핑 주요 용어 (LayoutGroup으로 카드→모달 공유 애니메이션) */}
-        <LayoutGroup>
-          <TermsSection
-            sectionTitle={ terms.sectionTitle }
-            leadText={ terms.leadText }
-            featured={ terms.featured }
-            onCardClick={ (term) => setSelectedTerm(term) }
+        { terms.allTerms.map((term, index) => (
+          <TermFullscreenSection
+            key={ term.id }
+            term={ term }
+            index={ index }
+            totalCount={ terms.allTerms.length }
+            onDetailClick={ () => setSelectedTerm(term) }
           />
-          <TermsDetailModal
-            isOpen={ Boolean(selectedTerm) }
-            onClose={ () => setSelectedTerm(null) }
-            term={ selectedTerm }
-          />
-        </LayoutGroup>
-
-        {/* 6. Article — 깊이 있는 아티클 */}
-        <ArticleSection
-          sectionTitle={ articles.sectionTitle }
-          items={ articles.items }
-          onCardClick={ (article) => setSelectedArticle(article) }
-        />
-
-        {/* 7. Story — 트랜서핑 인터뷰 */}
-        <StorySection
-          sectionTitle={ stories.sectionTitle }
-          items={ stories.items }
-        />
-
-        {/* 8. Survey — 설문조사 결과 */}
-        <SurveySection
-          sectionTitle={ survey.sectionTitle }
-          leadText={ survey.leadText }
-          surveys={ survey.surveys }
-        />
+        )) }
 
         {/* GradientOverlay 라이트 전환 트리거 — Outro 진입 전에 전환 시작 */}
         <Box ref={ outroRef } />
 
-        {/* 9. Outro — 마무리 인사 */}
+        {/* Outro — 마무리 인사 */}
         <OutroSection
           titles={ outro.titles }
           ctaText={ outro.ctaText }
@@ -135,11 +79,12 @@ function MagazinePage() {
         instagramUrl={ footer.instagramUrl }
         copyright={ footer.copyright }
       />
-      {/* Article 상세 모달 */}
-      <ArticleDetailModal
-        isOpen={ Boolean(selectedArticle) }
-        onClose={ () => setSelectedArticle(null) }
-        article={ selectedArticle }
+
+      {/* 용어 상세 모달 */}
+      <TermsDetailModal
+        isOpen={ Boolean(selectedTerm) }
+        onClose={ () => setSelectedTerm(null) }
+        term={ selectedTerm }
       />
     </PageContainer>
   );

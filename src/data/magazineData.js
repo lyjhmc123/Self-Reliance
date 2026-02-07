@@ -157,6 +157,11 @@ const magazineData = {
         quotes: [],
       },
     ],
+
+    /** 풀스크린 여정에 사용되는 전체 용어 (featured + extra, 순서 = 표시 순서) */
+    get allTerms() {
+      return [...this.featured, ...this.extra];
+    },
   },
 
   // ─────────────────────────────────────

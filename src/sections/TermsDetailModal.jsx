@@ -4,7 +4,6 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import { motion, AnimatePresence } from 'framer-motion';
-import GeometricPattern from '../components/dynamic-color/GeometricPattern';
 import RandomRevealText from '../components/kinetic-typography/RandomRevealText';
 
 /** 공유 이징 커브 */
@@ -45,16 +44,15 @@ function SectionDivider({ label }) {
 /**
  * TermsDetailModal 컴포넌트
  *
- * 용어 상세 콘텐츠를 풀스크린 에디토리얼 레이아웃 모달로 보여주는 컴포넌트.
- * 상단은 2단 히어로(좌측 기하학 패턴 + 우측 타이틀/설명/본문), 하단은 인용문 구조.
- * TermsSection 카드의 GeometricPattern과 layoutId를 공유하여 심리스 전환 애니메이션을 제공한다.
+ * 용어 상세 콘텐츠를 풀스크린 단일 칼럼 모달로 보여주는 컴포넌트.
+ * 텍스트 중심 레이아웃으로 타이틀, 설명, 본문, 인용문을 순서대로 표시한다.
  *
  * 동작 흐름:
- * 1. TermsSection에서 용어 카드를 클릭하면 이 모달이 열린다
- * 2. 카드의 기하학 패턴이 좌측 칼럼 위치로 자연스럽게 이동한다 (layoutId 공유)
- * 3. 타이틀/설명/본문이 우측에서 스태거드 페이드인으로 나타난다
+ * 1. 풀스크린 용어 섹션에서 '자세히 보기'를 클릭하면 이 모달이 열린다
+ * 2. fade-in + slide-up 애니메이션으로 모달이 나타난다
+ * 3. 타이틀이 RandomRevealText로 블러에서 나타나고, 설명/본문이 이어진다
  * 4. 스크롤하면 인용문(quotes)이 이어서 표시된다
- * 5. 닫기 버튼 또는 Escape 키로 모달이 닫히며, 패턴이 카드 위치로 복귀한다
+ * 5. 닫기 버튼 또는 Escape 키로 모달이 닫힌다
  *
  * Props:
  * @param {boolean} isOpen - 모달 열림 여부 [Required]
@@ -110,10 +108,10 @@ function TermsDetailModal({
       { isOpen && displayTerm && (
         <motion.div
           key={ displayTerm.id }
-          initial={ { opacity: 0 } }
-          animate={ { opacity: 1 } }
-          exit={ { opacity: 0 } }
-          transition={ { duration: 0.35, ease: 'easeOut' } }
+          initial={ { opacity: 0, y: 40 } }
+          animate={ { opacity: 1, y: 0 } }
+          exit={ { opacity: 0, y: 20 } }
+          transition={ { duration: 0.4, ease: EASE_SMOOTH } }
           role="dialog"
           aria-modal="true"
           style={ {
@@ -160,114 +158,62 @@ function TermsDetailModal({
               height: '100%',
             } }
           >
-            {/* ── 히어로 영역: 2단 레이아웃 ── */}
+            {/* ── 단일 칼럼 텍스트 레이아웃 ── */}
             <Container
-              maxWidth="lg"
+              maxWidth="sm"
               sx={ {
                 pt: { xs: 10, md: 14 },
                 pb: { xs: 4, md: 6 },
               } }
             >
-              <Box
+              {/* 타이틀 — 모달 진입 시 blur에서 나타남 */}
+              <RandomRevealText
+                key={ displayTerm.id }
+                text={ displayTerm.title }
+                variant="h2"
+                delay={ 300 }
+                stagger={ 50 }
                 sx={ {
-                  display: 'flex',
-                  flexDirection: { xs: 'column', md: 'row' },
-                  gap: { xs: 4, md: 8 },
-                  alignItems: { md: 'center' },
-                  minHeight: { md: '55vh' },
+                  fontWeight: 700,
+                  fontSize: { xs: '3rem', sm: '3.5rem', md: '4.5rem' },
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.02em',
+                  color: '#F5F2EE',
+                  mb: 2,
+                  display: 'block',
                 } }
-              >
-                {/* 좌측: 기하학 패턴 비주얼 — layoutId 공유 */}
-                <motion.div
-                  layoutId={ `term-pattern-${displayTerm.id}` }
-                  transition={ {
-                    layout: {
-                      duration: 0.5,
-                      ease: EASE_SMOOTH,
-                    },
-                  } }
-                  style={ {
-                    flex: '0 0 42%',
-                    overflow: 'hidden',
+              />
+
+              {/* 설명 — 이탤릭 세리프 */}
+              { displayTerm.description && (
+                <Typography
+                  variant="body1"
+                  sx={ {
+                    fontFamily: '"Cormorant Garamond", "Pretendard Variable", serif',
+                    fontStyle: 'italic',
+                    fontSize: { xs: '1.05rem', md: '1.15rem' },
+                    color: 'rgba(245, 242, 238, 0.55)',
+                    mb: 4,
                   } }
                 >
-                  <Box
-                    sx={ {
-                      aspectRatio: { xs: '4 / 3', md: '3 / 4' },
-                      maxHeight: { xs: 280, md: 'none' },
-                    } }
-                  >
-                    <GeometricPattern variant={ displayTerm.motif } />
-                  </Box>
-                </motion.div>
+                  { displayTerm.description }
+                </Typography>
+              ) }
 
-                {/* 우측: 헤더 정보 — 스태거드 페이드인 */}
-                <motion.div
-                  initial={ { opacity: 0, x: 40 } }
-                  animate={ { opacity: 1, x: 0 } }
-                  transition={ {
-                    duration: 0.4,
-                    delay: 0.3,
-                    ease: EASE_SMOOTH,
-                  } }
-                  style={ {
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
+              {/* 본문 */}
+              { displayTerm.body && (
+                <Typography
+                  variant="body1"
+                  sx={ {
+                    color: 'rgba(245, 242, 238, 0.7)',
+                    fontSize: { xs: '1.05rem', md: '1.15rem' },
+                    lineHeight: 1.9,
+                    wordBreak: 'keep-all',
                   } }
                 >
-                  {/* 타이틀 — 모달 진입 시 blur에서 나타남 */}
-                  <RandomRevealText
-                    key={ displayTerm.id }
-                    text={ displayTerm.title }
-                    variant="h2"
-                    delay={ 400 }
-                    stagger={ 50 }
-                    sx={ {
-                      fontWeight: 700,
-                      fontSize: { xs: '3rem', sm: '3.5rem', md: '4.5rem' },
-                      lineHeight: 1.1,
-                      letterSpacing: '-0.02em',
-                      color: '#F5F2EE',
-                      mb: 2,
-                      display: 'block',
-                    } }
-                  />
-
-                  {/* 설명 — 이탤릭 세리프 */}
-                  { displayTerm.description && (
-                    <Typography
-                      variant="body1"
-                      sx={ {
-                        fontFamily: '"Cormorant Garamond", "Pretendard Variable", serif',
-                        fontStyle: 'italic',
-                        fontSize: { xs: '1.05rem', md: '1.15rem' },
-                        color: 'rgba(245, 242, 238, 0.55)',
-                        mb: 3,
-                      } }
-                    >
-                      { displayTerm.description }
-                    </Typography>
-                  ) }
-
-                  {/* 본문 */}
-                  { displayTerm.body && (
-                    <Typography
-                      variant="body1"
-                      sx={ {
-                        color: 'rgba(245, 242, 238, 0.7)',
-                        fontSize: { xs: '1.05rem', md: '1.15rem' },
-                        lineHeight: 1.9,
-                        wordBreak: 'keep-all',
-                        maxWidth: 520,
-                      } }
-                    >
-                      { displayTerm.body }
-                    </Typography>
-                  ) }
-                </motion.div>
-              </Box>
+                  { displayTerm.body }
+                </Typography>
+              ) }
             </Container>
 
             {/* ── 인용문 ── */}
