@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import HeroSection from '../sections/HeroSection';
+import LeadTextSection from '../sections/LeadTextSection';
 import TermFullscreenSection from '../sections/TermFullscreenSection';
 import TermsDetailModal from '../sections/TermsDetailModal';
 import OutroSection from '../sections/OutroSection';
@@ -44,12 +45,14 @@ function MagazinePage() {
         logo={ intro.logo }
         subtitle={ intro.subtitle }
         title={ intro.title }
-        leadText={ intro.leadText }
         footerText={ intro.footerText }
       />
 
-      {/* 매거진 입장 — 용어 풀스크린 여정 */}
-      <SectionContainer sx={ { py: 0, position: 'relative', zIndex: 2 } }>
+      {/* 리드문 — 다크 배경 위 리드 텍스트 */}
+      <LeadTextSection text={ intro.leadText } />
+
+      {/* 매거진 입장 — 용어 풀스크린 여정 (LeadTextSection과 100svh 겹침) */}
+      <SectionContainer sx={ { py: 0, position: 'relative', zIndex: 2, marginTop: '-100svh' } }>
         { terms.allTerms.map((term, index) => (
           <TermFullscreenSection
             key={ term.id }

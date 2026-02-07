@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import { FullPageContainer } from '../components/layout/FullPageContainer';
 import FadeTransition from '../components/motion/FadeTransition';
 import GeometricPattern from '../components/dynamic-color/GeometricPattern';
+import ScrollRevealText from '../components/kinetic-typography/ScrollRevealText';
 
 /**
  * TermFullscreenSection 컴포넌트
@@ -16,8 +17,8 @@ import GeometricPattern from '../components/dynamic-color/GeometricPattern';
  * 동작 흐름:
  * 1. 사용자가 스크롤하여 이 섹션이 뷰포트에 진입한다
  * 2. GeometricPattern이 배경 전체에 렌더링되며 마우스 인터랙션에 반응한다
- * 3. 하단에서 순서 인디케이터, 용어 타이틀, 설명이 페이드인으로 나타난다
- * 4. '자세히 보기' 버튼을 클릭하면 onDetailClick이 호출된다
+ * 3. (grid variant) 구가 완전히 형성된 후 타이틀과 설명이 서서히 페이드인된다
+ * 4. (기타 variant) 하단에서 순서 인디케이터, 용어 타이틀, 설명이 페이드인으로 나타난다
  *
  * Props:
  * @param {object} term - 용어 데이터 객체 { id, motif, title, description, body, quotes } [Required]
@@ -53,17 +54,20 @@ function TermFullscreenSection({
     const rect = sectionRef.current.getBoundingClientRect();
     const vh = window.innerHeight;
 
-    /** 섹션 중앙 ↔ 뷰포트 중앙 거리 기반 진행률
-     *  - 섹션 중앙이 뷰포트 밖(1vh 이상) → 0
-     *  - 섹션 중앙이 뷰포트 중앙에 정확히 도달 → 1
-     *  - 섹션이 스크롤되어 벗어남 → 0 */
     const sectionCenter = (rect.top + rect.bottom) / 2;
     const viewportCenter = vh / 2;
-    const normalizedDist = Math.abs(sectionCenter - viewportCenter) / vh;
-    const raw = Math.max(0, 1 - normalizedDist);
+    const distFromCenter = sectionCenter - viewportCenter;
 
-    /** ease-in: 천천히 수렴하다가 중앙 도달 시 구 완성 */
-    scrollInfluenceRef.current = raw * raw;
+    /** 단방향 수렴: 섹션이 뷰포트에 진입하면서 구가 형성되고, 완성 후 유지
+     *  - 섹션이 뷰포트 아래에 있을 때 → 0 (파티클 부유)
+     *  - 섹션 중앙이 뷰포트 중앙에 도달 → 1 (구 완성)
+     *  - 섹션이 뷰포트 위로 스크롤 → 1 유지 */
+    if (distFromCenter > 0) {
+      const enterProgress = Math.max(0, 1 - distFromCenter / (vh * 0.5));
+      scrollInfluenceRef.current = enterProgress * enterProgress;
+    } else {
+      scrollInfluenceRef.current = 1;
+    }
   }, []);
 
   useEffect(() => {
@@ -72,6 +76,75 @@ function TermFullscreenSection({
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isGridVariant, handleScroll]);
+
+  /** 텍스트 콘텐츠 — non-grid variant 전용 */
+  const textContent = (
+    <Box sx={ { pointerEvents: 'auto' } }>
+      {/* 순서 인디케이터 */}
+      <Typography
+        variant="caption"
+        sx={ {
+          color: 'rgba(245, 242, 238, 0.5)',
+          fontFamily: '"Cormorant Garamond", "Pretendard Variable", serif',
+          fontSize: { xs: '0.85rem', md: '0.95rem' },
+          letterSpacing: '0.08em',
+          mb: 1.5,
+          display: 'block',
+        } }
+      >
+        { orderLabel }
+      </Typography>
+
+      {/* 용어 타이틀 */}
+      <Typography
+        variant="h2"
+        sx={ {
+          fontWeight: 700,
+          fontSize: { xs: '2.5rem', sm: '3rem', md: '4rem' },
+          lineHeight: 1.1,
+          letterSpacing: '-0.02em',
+          color: '#F5F2EE',
+          mb: 2,
+        } }
+      >
+        { term.title }
+      </Typography>
+
+      {/* 설명 */}
+      <Typography
+        variant="body1"
+        sx={ {
+          color: 'rgba(245, 242, 238, 0.7)',
+          fontSize: { xs: '1rem', md: '1.1rem' },
+          lineHeight: 1.7,
+          maxWidth: 480,
+          mb: 3,
+          wordBreak: 'keep-all',
+        } }
+      >
+        { term.description }
+      </Typography>
+
+      {/* CTA 버튼 */}
+      <Button
+        onClick={ onDetailClick }
+        variant="text"
+        sx={ {
+          color: '#FFC66E',
+          fontSize: { xs: '0.9rem', md: '1rem' },
+          fontWeight: 600,
+          letterSpacing: '0.02em',
+          px: 0,
+          '&:hover': {
+            backgroundColor: 'transparent',
+            opacity: 0.8,
+          },
+        } }
+      >
+        자세히 보기 →
+      </Button>
+    </Box>
+  );
 
   return (
     <Box ref={ sectionRef }>
@@ -122,78 +195,51 @@ function TermFullscreenSection({
           pb: { xs: 6, md: 10 },
         } }
       >
-        <FadeTransition
-          isTriggerOnView
-          direction="up"
-          distance={ 32 }
-          duration={ 600 }
-        >
+        { isGridVariant ? (
           <Box sx={ { pointerEvents: 'auto' } }>
-            {/* 순서 인디케이터 */}
-            <Typography
-              variant="caption"
-              sx={ {
-                color: 'rgba(245, 242, 238, 0.5)',
-                fontFamily: '"Cormorant Garamond", "Pretendard Variable", serif',
-                fontSize: { xs: '0.85rem', md: '0.95rem' },
-                letterSpacing: '0.08em',
-                mb: 1.5,
-                display: 'block',
-              } }
-            >
-              { orderLabel }
-            </Typography>
-
-            {/* 용어 타이틀 */}
-            <Typography
+            {/* 용어 타이틀 — 스크롤 리빌 */}
+            <ScrollRevealText
+              text={ term.title }
               variant="h2"
+              activeColor="#F5F2EE"
+              inactiveColor="rgba(245, 242, 238, 0.1)"
               sx={ {
-                fontWeight: 700,
-                fontSize: { xs: '2.5rem', sm: '3rem', md: '4rem' },
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-                color: '#F5F2EE',
-                mb: 2,
-              } }
-            >
-              { term.title }
-            </Typography>
-
-            {/* 설명 */}
-            <Typography
-              variant="body1"
-              sx={ {
-                color: 'rgba(245, 242, 238, 0.7)',
-                fontSize: { xs: '1rem', md: '1.1rem' },
-                lineHeight: 1.7,
-                maxWidth: 480,
-                mb: 3,
-                wordBreak: 'keep-all',
-              } }
-            >
-              { term.description }
-            </Typography>
-
-            {/* CTA 버튼 */}
-            <Button
-              onClick={ onDetailClick }
-              variant="text"
-              sx={ {
-                color: '#FFC66E',
-                fontSize: { xs: '0.9rem', md: '1rem' },
-                fontWeight: 600,
-                letterSpacing: '0.02em',
-                px: 0,
-                '&:hover': {
-                  backgroundColor: 'transparent',
-                  opacity: 0.8,
+                '& .MuiTypography-root': {
+                  fontWeight: 700,
+                  fontSize: { xs: '2.5rem', sm: '3rem', md: '4rem' },
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.02em',
+                  mb: 2,
                 },
               } }
-            >
-              자세히 보기 →
-            </Button>
+            />
+
+            {/* 설명 — 스크롤 리빌 */}
+            <ScrollRevealText
+              text={ term.description }
+              variant="body1"
+              activeColor="rgba(245, 242, 238, 0.7)"
+              inactiveColor="rgba(245, 242, 238, 0.1)"
+              sx={ {
+                '& .MuiTypography-root': {
+                  fontSize: { xs: '1rem', md: '1.1rem' },
+                  lineHeight: 1.7,
+                  maxWidth: 480,
+                  mb: 0,
+                },
+              } }
+            />
           </Box>
-        </FadeTransition>
+        ) : (
+          <FadeTransition
+            isTriggerOnView
+            direction="up"
+            distance={ 32 }
+            duration={ 600 }
+          >
+            { textContent }
+          </FadeTransition>
+        ) }
       </Container>
       </FullPageContainer>
     </Box>
