@@ -6,18 +6,18 @@ import GeometricPattern from '../components/dynamic-color/GeometricPattern';
  * VariantsSpaceCard 컴포넌트
  *
  * 가능태 공간 섹션의 가로 스크롤 카드.
- * 키비주얼이 뷰포트 세로 중앙에 위치하고, 그 아래에 헤드라인 + 본문이 표시된다.
- * 타이틀 슬라이드의 구와 키비주얼이 일직선 상에 놓인다.
+ * 키비주얼 상단 배치, 아래에 헤드라인 + 본문이 넓게 표시된다.
  *
  * 동작 흐름:
  * 1. 사용자가 가로 스크롤하여 카드가 뷰포트에 진입한다
- * 2. 중앙에 GeometricPattern 모티프가 렌더링된다
+ * 2. 상단에 GeometricPattern 모티프가 렌더링된다
  * 3. 아래에 헤드라인과 본문이 표시된다
  *
  * Props:
  * @param {string} motif - GeometricPattern variant [Required]
  * @param {string} headline - 카드 제목 [Required]
  * @param {string} body - 카드 본문 [Required]
+ * @param {string} bodyHighlight - 본문 하단 강조 텍스트 (볼드 + 액센트 컬러) [Optional]
  * @param {object} scrollInfluenceRef - 스크롤 기반 수렴 제어 ref (grid variant 전용) [Optional]
  * @param {object} visualRef - 비주얼 영역 DOM ref (부모에서 opacity 제어용) [Optional]
  * @param {object} sx - 추가 스타일 [Optional]
@@ -33,6 +33,7 @@ function VariantsSpaceCard({
   motif,
   headline,
   body,
+  bodyHighlight,
   scrollInfluenceRef,
   visualRef,
   sx = {},
@@ -48,14 +49,14 @@ function VariantsSpaceCard({
         ...sx,
       } }
     >
-      {/* 상단 여백 — 키비주얼 중앙 정렬 (구 중심 = 50vh) */}
-      <Box sx={ { flex: '0 0 calc(50vh - 17.5vh)' } } />
+      {/* 상단 여백 */}
+      <Box sx={ { flex: '0 0 12vh' } } />
 
-      {/* 키비주얼 — GeometricPattern (중심이 뷰포트 50vh에 위치) */}
+      {/* 키비주얼 — GeometricPattern */}
       <Box
         ref={ visualRef }
         sx={ {
-          flex: '0 0 35vh',
+          flex: '0 0 28vh',
           position: 'relative',
           minHeight: 0,
           opacity: visualRef ? 0 : 1,
@@ -67,7 +68,7 @@ function VariantsSpaceCard({
         />
       </Box>
 
-      {/* 텍스트 영역 */}
+      {/* 텍스트 영역 — ~60vh */}
       <Box
         sx={ {
           flex: '1 1 auto',
@@ -108,6 +109,22 @@ function VariantsSpaceCard({
         >
           { body }
         </Typography>
+
+        {/* 강조 텍스트 */}
+        { bodyHighlight && (
+          <Typography
+            variant="body1"
+            sx={ {
+              color: '#FFC66E',
+              fontWeight: 700,
+              fontSize: { xs: '0.9rem', md: '0.95rem' },
+              lineHeight: 1.85,
+              wordBreak: 'keep-all',
+            } }
+          >
+            { bodyHighlight }
+          </Typography>
+        ) }
       </Box>
     </Box>
   );

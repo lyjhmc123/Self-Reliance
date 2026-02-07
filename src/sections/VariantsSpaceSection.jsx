@@ -42,6 +42,7 @@ function VariantsSpaceSection({
   const firstCardInfluenceRef = useRef(0);
   const firstCardVisualRef = useRef(null);
   const titlePatternRef = useRef(null);
+  const firstCardContainerRef = useRef(null);
   const [scrollDistance, setScrollDistance] = useState(0);
   const [gapWidth, setGapWidth] = useState(
     () => typeof window !== 'undefined' ? window.innerWidth * 0.3 : 0
@@ -102,15 +103,24 @@ function VariantsSpaceSection({
     ? convergenceRatio + ((gapWidth + cardWidth) / scrollDistance) * (1 - convergenceRatio)
     : convergenceRatio;
 
-  /** Phase 1~2: 구 수렴 → 이동 + 흩어짐 → 첫 카드 수렴 */
+  /** 첫 카드가 뷰포트에 10% 드러나는 시점 (핸드오프 기준점) */
+  const card10Ratio = cardEnterRatio + (cardFullRatio - cardEnterRatio) * 0.1;
+
+  /** 첫 카드 슬라이드업 완료 시점 (10% 진입 후 적절한 구간) */
+  const slideUpEndRatio = Math.min(1, card10Ratio + (1 - card10Ratio) * 0.15);
+
+  /** 첫 카드 구 정렬용 세로 오프셋 (카드 비주얼 중심 26vh → 구 중심 50vh) */
+  const cardAlignOffset = typeof window !== 'undefined' ? window.innerHeight * 0.24 : 0;
+
+  /** Phase 1~2: 구 수렴 → 이동 + 흩어짐 → 첫 카드 안착 */
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     /** 타이틀 구: 수렴 (0→1) */
     if (v <= convergenceRatio) {
       scrollInfluenceRef.current = convergenceRatio > 0 ? v / convergenceRatio : 0;
     }
-    /** 타이틀 구: 흩어짐 (1→0) — 첫 카드 완전 노출 시점까지 */
-    else if (v <= cardFullRatio) {
-      const t = (v - convergenceRatio) / (cardFullRatio - convergenceRatio);
+    /** 타이틀 구: 흩어짐 (1→0) — 10% 진입 시점까지 */
+    else if (v <= card10Ratio) {
+      const t = (v - convergenceRatio) / (card10Ratio - convergenceRatio);
       scrollInfluenceRef.current = 1 - t;
     }
     /** 구 완전히 흩어짐 */
@@ -118,40 +128,41 @@ function VariantsSpaceSection({
       scrollInfluenceRef.current = 0;
     }
 
-    /** 타이틀 구 캔버스: 흩어지며 첫 카드 방향으로 이동 (CSS translateX) */
+    /** 타이틀 구 캔버스: 흩어지며 첫 카드 방향으로 이동, 10% 진입 전 페이드아웃 완료 */
     if (titlePatternRef.current) {
       if (v <= convergenceRatio) {
         titlePatternRef.current.style.transform = 'translateX(0)';
         titlePatternRef.current.style.opacity = '1';
-      } else if (v <= cardFullRatio) {
-        const t = (v - convergenceRatio) / (cardFullRatio - convergenceRatio);
+      } else if (v <= card10Ratio) {
+        const t = (v - convergenceRatio) / (card10Ratio - convergenceRatio);
         const targetX = window.innerWidth / 2 + gapWidth + cardWidth / 2;
         titlePatternRef.current.style.transform = `translateX(${t * targetX}px)`;
-        titlePatternRef.current.style.opacity = `${Math.max(0, 1 - t * 1.5)}`;
+        /** 이동 후반(60%~100%)에서 페이드아웃 */
+        titlePatternRef.current.style.opacity = t < 0.6
+          ? '1'
+          : `${Math.max(0, 1 - (t - 0.6) / 0.4)}`;
       } else {
         titlePatternRef.current.style.opacity = '0';
       }
     }
 
-    /** 첫 카드 키비주얼: 흩어진 상태로 안착 (0→0.15) */
-    if (v < cardEnterRatio) {
-      firstCardInfluenceRef.current = 0;
-    } else if (v < cardFullRatio) {
-      const t = (v - cardEnterRatio) / (cardFullRatio - cardEnterRatio);
-      firstCardInfluenceRef.current = t * 0.15;
-    } else {
-      firstCardInfluenceRef.current = 0.15;
+    /** 첫 카드 키비주얼: 10% 진입 시 흩어진 상태로 안착 */
+    firstCardInfluenceRef.current = v >= card10Ratio ? 0.15 : 0;
+
+    /** 첫 카드 비주얼: 10% 진입 시 노출 */
+    if (firstCardVisualRef.current) {
+      firstCardVisualRef.current.style.opacity = v >= card10Ratio ? '1' : '0';
     }
 
-    /** 첫 카드 비주얼: 카드 진입 시 서서히 노출 */
-    if (firstCardVisualRef.current) {
-      if (v < cardEnterRatio) {
-        firstCardVisualRef.current.style.opacity = '0';
-      } else if (v < cardFullRatio) {
-        const t = (v - cardEnterRatio) / (cardFullRatio - cardEnterRatio);
-        firstCardVisualRef.current.style.opacity = `${t}`;
+    /** 첫 카드 컨테이너: 구 정렬 → 10% 진입 후 상단으로 슬라이드업 */
+    if (firstCardContainerRef.current) {
+      if (v < card10Ratio) {
+        firstCardContainerRef.current.style.transform = `translateY(${cardAlignOffset}px)`;
+      } else if (v < slideUpEndRatio) {
+        const t = (v - card10Ratio) / (slideUpEndRatio - card10Ratio);
+        firstCardContainerRef.current.style.transform = `translateY(${cardAlignOffset * (1 - t)}px)`;
       } else {
-        firstCardVisualRef.current.style.opacity = '1';
+        firstCardContainerRef.current.style.transform = 'translateY(0)';
       }
     }
   });
@@ -290,11 +301,16 @@ function VariantsSpaceSection({
 
           {/* 카드 슬라이드 */}
           { cards.map((card, cardIndex) => (
-            <Box key={ card.id } sx={ { flexShrink: 0 } }>
+            <Box
+              key={ card.id }
+              ref={ cardIndex === 0 ? firstCardContainerRef : undefined }
+              sx={ { flexShrink: 0 } }
+            >
               <VariantsSpaceCard
                 motif={ card.motif }
                 headline={ card.headline }
                 body={ card.body }
+                bodyHighlight={ card.bodyHighlight }
                 scrollInfluenceRef={ cardIndex === 0 ? firstCardInfluenceRef : undefined }
                 visualRef={ cardIndex === 0 ? firstCardVisualRef : undefined }
               />
