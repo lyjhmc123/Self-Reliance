@@ -197,12 +197,14 @@ function TermFullscreenSection({
       >
         { isGridVariant ? (
           <Box sx={ { pointerEvents: 'auto' } }>
-            {/* 용어 타이틀 — 스크롤 리빌 */}
+            {/* 용어 타이틀 — 자동 리빌 */}
             <ScrollRevealText
               text={ term.title }
               variant="h2"
               activeColor="#F5F2EE"
               inactiveColor="rgba(245, 242, 238, 0.1)"
+              autoReveal
+              autoRevealDuration={ 1200 }
               sx={ {
                 '& .MuiTypography-root': {
                   fontWeight: 700,
@@ -214,12 +216,14 @@ function TermFullscreenSection({
               } }
             />
 
-            {/* 설명 — 스크롤 리빌 */}
+            {/* 설명 — 자동 리빌 */}
             <ScrollRevealText
               text={ term.description }
               variant="body1"
               activeColor="rgba(245, 242, 238, 0.7)"
               inactiveColor="rgba(245, 242, 238, 0.1)"
+              autoReveal
+              autoRevealDuration={ 2000 }
               sx={ {
                 '& .MuiTypography-root': {
                   fontSize: { xs: '1rem', md: '1.1rem' },

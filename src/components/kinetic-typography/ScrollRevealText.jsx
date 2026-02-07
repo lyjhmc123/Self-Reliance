@@ -13,29 +13,73 @@ import Typography from '@mui/material/Typography';
  * 2. 스크롤 진행률(0~1)에 따라 글자가 왼쪽부터 순차적으로 나타난다
  * 3. 비활성 글자는 투명도가 낮고, 활성 글자는 완전히 표시된다
  * 4. 뷰포트 중앙을 지나면 모든 글자가 활성화된다
+ * 5. autoReveal이 true이면 뷰포트 진입 시 스크롤 없이 자동으로 전체 텍스트가 드러난다
  *
  * Props:
  * @param {string} text - 표시할 텍스트 [Required]
  * @param {string} activeColor - 활성화된 글자 색상 [Optional, 기본값: 'text.primary']
  * @param {string} inactiveColor - 비활성 글자 색상 [Optional, 기본값: 'text.disabled']
  * @param {string} variant - MUI Typography variant [Optional, 기본값: 'h4']
+ * @param {boolean} autoReveal - 뷰포트 진입 시 자동 리빌 여부 [Optional, 기본값: false]
+ * @param {number} autoRevealDuration - 자동 리빌 애니메이션 시간(ms) [Optional, 기본값: 1500]
  * @param {object} sx - MUI sx 스타일 [Optional]
  *
  * Example usage:
- * <ScrollRevealText text="스크롤하면 텍스트가 나타납니다. 문장 단위로 분리됩니다." />
+ * <ScrollRevealText text="스크롤하면 텍스트가 나타납니다." />
+ * <ScrollRevealText text="자동으로 나타납니다." autoReveal />
  */
 function ScrollRevealText({
   text,
   activeColor = 'text.primary',
   inactiveColor = 'text.disabled',
   variant = 'h4',
+  autoReveal = false,
+  autoRevealDuration = 1500,
   sx = {},
 }) {
   const containerRef = useRef(null);
   const [progress, setProgress] = useState(0);
 
+  /** autoReveal 모드: 뷰포트 진입 시 자동으로 progress를 0→1 애니메이션 */
+  useEffect(() => {
+    if (!autoReveal || !containerRef.current) return;
+
+    let animationId;
+    let startTime;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const newProgress = Math.min(1, elapsed / autoRevealDuration);
+      setProgress(newProgress);
+      if (newProgress < 1) {
+        animationId = requestAnimationFrame(animate);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startTime = undefined;
+          animationId = requestAnimationFrame(animate);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(containerRef.current);
+
+    return () => {
+      observer.disconnect();
+      if (animationId) cancelAnimationFrame(animationId);
+    };
+  }, [autoReveal, autoRevealDuration]);
+
   /** 스크롤 위치 기반 진행률 계산 (requestAnimationFrame throttle) */
   useEffect(() => {
+    if (autoReveal) return;
+
     let ticking = false;
 
     const updateProgress = () => {
@@ -65,7 +109,7 @@ function ScrollRevealText({
     updateProgress();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [autoReveal]);
 
   /** 문장 단위 분리 ('. ' 기준) */
   const sentences = text.split('. ').map((s, i, arr) =>
