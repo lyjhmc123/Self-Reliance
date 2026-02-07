@@ -53,14 +53,17 @@ function TermFullscreenSection({
     const rect = sectionRef.current.getBoundingClientRect();
     const vh = window.innerHeight;
 
-    /** 진입: 섹션 상단이 뷰포트 하단→상단으로 이동 (0→1) */
-    const enterProgress = 1 - (rect.top / vh);
-    /** 퇴장: 섹션 하단이 뷰포트 하단→상단으로 이동 (1→0) */
-    const leaveProgress = rect.bottom / vh;
+    /** 섹션 중앙 ↔ 뷰포트 중앙 거리 기반 진행률
+     *  - 섹션 중앙이 뷰포트 밖(1vh 이상) → 0
+     *  - 섹션 중앙이 뷰포트 중앙에 정확히 도달 → 1
+     *  - 섹션이 스크롤되어 벗어남 → 0 */
+    const sectionCenter = (rect.top + rect.bottom) / 2;
+    const viewportCenter = vh / 2;
+    const normalizedDist = Math.abs(sectionCenter - viewportCenter) / vh;
+    const raw = Math.max(0, 1 - normalizedDist);
 
-    const raw = Math.max(0, Math.min(1, Math.min(enterProgress, leaveProgress)));
-    /** ease-out: 진입 시 빠르게 수렴, 퇴장 시 자연스럽게 해체 */
-    scrollInfluenceRef.current = 1 - (1 - raw) * (1 - raw);
+    /** ease-in: 천천히 수렴하다가 중앙 도달 시 구 완성 */
+    scrollInfluenceRef.current = raw * raw;
   }, []);
 
   useEffect(() => {
