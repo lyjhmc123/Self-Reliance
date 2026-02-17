@@ -1,36 +1,30 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import HeroSection from '../sections/HeroSection';
 import LeadTextSection, { LeadHeadlineSection } from '../sections/LeadTextSection';
-import TermFullscreenSection from '../sections/TermFullscreenSection';
-import VariantsSpaceSection from '../sections/VariantsSpaceSection';
-import TermsDetailModal from '../sections/TermsDetailModal';
-import OutroSection from '../sections/OutroSection';
 import FooterSection from '../sections/FooterSection';
+import OutroSection from '../sections/OutroSection';
 import GradientOverlay from '../components/dynamic-color/GradientOverlay';
 import Box from '@mui/material/Box';
 import { PageContainer } from '../components/layout/PageContainer';
-import { SectionContainer } from '../components/container/SectionContainer';
 import magazineData from '../data/magazineData';
 
 /**
  * MagazinePage 컴포넌트
  *
  * Intertext Magazine Issue No.1 전체 페이지.
- * 용어 중심 몰입형 경험 — 각 트랜서핑 용어가 풀스크린 섹션으로 표시된다.
+ * 풀스크린 섹션 기반 몰입형 매거진 경험.
  *
  * 동작 흐름:
  * 1. 사용자가 페이지에 진입하면 HeroSection(표지)이 보인다
- * 2. 스크롤하면 8개 트랜서핑 용어가 각각 풀스크린 섹션으로 나타난다
- * 3. 각 용어 섹션의 '자세히 보기' 클릭 시 TermsDetailModal이 열린다
- * 4. 모든 용어를 지나면 Outro, Footer가 이어진다
+ * 2. 스크롤하면 리드 헤드라인, 리드 본문이 순서대로 나타난다
+ * 3. Outro → Footer 순으로 이어진다
  *
  * Example usage:
  * <MagazinePage />
  */
 function MagazinePage() {
-  const { intro, terms, outro, footer } = magazineData;
+  const { intro, outro, footer } = magazineData;
   const outroRef = useRef(null);
-  const [selectedTerm, setSelectedTerm] = useState(null);
 
   return (
     <PageContainer maxWidth={ false } disableGutters>
@@ -55,38 +49,15 @@ function MagazinePage() {
       {/* 리드 본문 — 다크 배경 위 리드 텍스트 */}
       <LeadTextSection text={ intro.leadText } />
 
-      {/* 매거진 입장 — 용어 풀스크린 여정 (LeadTextSection과 100svh 겹침) */}
-      <SectionContainer sx={ { py: 0, position: 'relative', zIndex: 2, marginTop: '-100svh' } }>
-        { terms.allTerms.map((term, index) => (
-          term.id === 'variants-space' ? (
-            <VariantsSpaceSection
-              key={ term.id }
-              term={ term }
-              index={ index }
-              totalCount={ terms.allTerms.length }
-              onDetailClick={ () => setSelectedTerm(term) }
-            />
-          ) : (
-            <TermFullscreenSection
-              key={ term.id }
-              term={ term }
-              index={ index }
-              totalCount={ terms.allTerms.length }
-              onDetailClick={ () => setSelectedTerm(term) }
-            />
-          )
-        )) }
+      {/* GradientOverlay 라이트 전환 트리거 — Outro 진입 전에 전환 시작 */}
+      <Box ref={ outroRef } />
 
-        {/* GradientOverlay 라이트 전환 트리거 — Outro 진입 전에 전환 시작 */}
-        <Box ref={ outroRef } />
-
-        {/* Outro — 마무리 인사 */}
-        <OutroSection
-          titles={ outro.titles }
-          ctaText={ outro.ctaText }
-          links={ outro.links }
-        />
-      </SectionContainer>
+      {/* Outro — 마무리 인사 */}
+      <OutroSection
+        titles={ outro.titles }
+        ctaText={ outro.ctaText }
+        links={ outro.links }
+      />
 
       {/* 퇴장 — 라이트 영역 */}
       <FooterSection
@@ -95,13 +66,6 @@ function MagazinePage() {
         instagramHandle={ footer.instagramHandle }
         instagramUrl={ footer.instagramUrl }
         copyright={ footer.copyright }
-      />
-
-      {/* 용어 상세 모달 */}
-      <TermsDetailModal
-        isOpen={ Boolean(selectedTerm) }
-        onClose={ () => setSelectedTerm(null) }
-        term={ selectedTerm }
       />
     </PageContainer>
   );
