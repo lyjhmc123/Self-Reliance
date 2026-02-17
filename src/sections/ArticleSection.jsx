@@ -123,30 +123,6 @@ function ArticleSection({ title, bodyBlocks = [], sx }) {
     return () => clearTimeout(timer);
   }, [isFullyRevealed, bodyBlocks.length]);
 
-  /** 본문이 모두 드러나기 전까지 스크롤 잠금 */
-  useEffect(() => {
-    if (!isVisible || isFullyRevealed) return;
-
-    /** 섹션을 뷰포트에 스냅 */
-    if (sectionRef.current) {
-      sectionRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    /** 스냅 완료 후 사용자 스크롤 입력 차단 */
-    const prevent = (e) => e.preventDefault();
-
-    const timer = setTimeout(() => {
-      window.addEventListener('wheel', prevent, { passive: false });
-      window.addEventListener('touchmove', prevent, { passive: false });
-    }, 800);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('wheel', prevent);
-      window.removeEventListener('touchmove', prevent);
-    };
-  }, [isVisible, isFullyRevealed]);
-
   return (
     <Box
       ref={ sectionRef }
