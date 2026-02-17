@@ -107,6 +107,7 @@ function HeroSection({
             stagger={ 60 }
             sx={ {
               fontFamily: '"Noto Serif KR", serif',
+              fontWeight: 500,
               fontSize: { xs: '3.5rem', sm: '4.5rem', md: '7rem' },
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
