@@ -6,10 +6,12 @@ import ArticleSection from '../sections/ArticleSection';
 import FooterSection from '../sections/FooterSection';
 import OutroSection from '../sections/OutroSection';
 import GradientOverlay from '../components/dynamic-color/GradientOverlay';
+import PerspectiveTransition from '../components/motion/PerspectiveTransition';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { PageContainer } from '../components/layout/PageContainer';
 import magazineData from '../data/magazineData';
+import selfImage from '../assets/self.jpg';
 
 /**
  * MagazinePage 컴포넌트
@@ -457,7 +459,7 @@ function MagazinePage() {
         </Typography>
       </Box>
 
-      {/* 출처 안내 */}
+      {/* 출처 안내 + 도서 이미지 */}
       <Box
         sx={ {
           minHeight: '100svh',
@@ -480,8 +482,34 @@ function MagazinePage() {
             wordBreak: 'keep-all',
           } }
         >
-          더 많은 텍스트는 랄프 왈도 에머슨 &lt;자기 신뢰&gt; 에서 만날 수 있습니다.
+          더 많은 텍스트는
+          <br />
+          랄프 왈도 에머슨 &lt;자기 신뢰&gt; 에서 만날 수 있습니다.
         </Typography>
+
+        {/* 우하단 도서 커버 — PerspectiveTransition */}
+        <PerspectiveTransition
+          isTriggerOnView
+          rotateFrom={ 45 }
+          duration={ 1200 }
+          delay={ 800 }
+          sx={ {
+            position: 'absolute',
+            bottom: { xs: '10%', md: '12%' },
+            right: { xs: '8%', md: '12%' },
+          } }
+        >
+          <Box
+            component="img"
+            src={ selfImage }
+            alt="자기 신뢰"
+            sx={ {
+              width: { xs: 100, sm: 120, md: 140 },
+              height: 'auto',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            } }
+          />
+        </PerspectiveTransition>
       </Box>
 
       {/* GradientOverlay 라이트 전환 트리거 — Outro 진입 전에 전환 시작 */}
