@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import HeroSection from '../sections/HeroSection';
-import LeadTextSection from '../sections/LeadTextSection';
+import LeadTextSection, { LeadHeadlineSection } from '../sections/LeadTextSection';
 import TermFullscreenSection from '../sections/TermFullscreenSection';
 import VariantsSpaceSection from '../sections/VariantsSpaceSection';
 import TermsDetailModal from '../sections/TermsDetailModal';
@@ -49,7 +49,10 @@ function MagazinePage() {
         footerText={ intro.footerText }
       />
 
-      {/* 리드문 — 다크 배경 위 리드 텍스트 */}
+      {/* 리드 헤드라인 — 풀스크린 인용문 */}
+      <LeadHeadlineSection headline={ intro.leadHeadline } />
+
+      {/* 리드 본문 — 다크 배경 위 리드 텍스트 */}
       <LeadTextSection text={ intro.leadText } />
 
       {/* 매거진 입장 — 용어 풀스크린 여정 (LeadTextSection과 100svh 겹침) */}
