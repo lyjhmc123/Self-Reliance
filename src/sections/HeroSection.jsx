@@ -142,15 +142,15 @@ function HeroSection({
         } }
       />
 
-      {/* 하단 그라데이션 — 다음 섹션(다크)으로 자연스러운 전환 */}
+      {/* 하단 그라데이션 — 다음 섹션(라이트)으로 자연스러운 전환 */}
       <Box
         sx={ {
           position: 'absolute',
           bottom: 0,
           left: 0,
           width: '100%',
-          height: '40%',
-          background: 'linear-gradient(to bottom, transparent 0%, #12100E 100%)',
+          height: '12%',
+          background: 'linear-gradient(to bottom, transparent 0%, #F5F2EE 100%)',
           zIndex: 1,
           pointerEvents: 'none',
         } }
@@ -289,8 +289,8 @@ function HeroSection({
             variant="h2"
             sx={ {
               fontFamily: '"Noto Serif KR", serif',
-              fontWeight: 600,
-              fontSize: { xs: '3.15rem', sm: '4.7rem', md: '6.9rem', lg: '8.8rem' },
+              fontWeight: 400,
+              fontSize: { xs: '2.8rem', sm: '4.2rem', md: '6.2rem', lg: '7.9rem' },
               color: '#F5F2EE',
               letterSpacing: '0.08em',
               lineHeight: 1.2,

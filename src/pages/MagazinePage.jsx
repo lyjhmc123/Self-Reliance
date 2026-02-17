@@ -45,23 +45,29 @@ function MagazinePage() {
         authorInfo="랄프 왈도 에머슨, 현대지성"
       />
 
-      {/* 히어로 → 다크 섹션 전환 브릿지 */}
+      {/* 히어로 → 라이트 섹션 전환 브릿지 */}
       <Box
         sx={ {
           position: 'relative',
           zIndex: 3,
           height: '30vh',
           mt: '-30vh',
-          background: 'linear-gradient(to bottom, transparent 0%, #12100E 100%)',
+          background: 'linear-gradient(to bottom, transparent 0%, #F5F2EE 100%)',
           pointerEvents: 'none',
         } }
       />
 
-      {/* 리드 헤드라인 — 풀스크린 인용문 */}
-      <LeadHeadlineSection headline={ intro.leadHeadline } />
+      {/* 리드 헤드라인 — 라이트 배경 풀스크린 인용문 */}
+      <LeadHeadlineSection
+        headline={ intro.leadHeadline }
+        sx={ { backgroundColor: '#F5F2EE' } }
+      />
 
-      {/* 리드 본문 — 다크 배경 위 리드 텍스트 */}
-      <LeadTextSection text={ intro.leadText } />
+      {/* 리드 본문 — 라이트→다크 그라데이션 배경 */}
+      <LeadTextSection
+        text={ intro.leadText }
+        sx={ { background: 'linear-gradient(to bottom, #F5F2EE 60%, #12100E 100%)' } }
+      />
 
       {/* 핵심 메타포 — 어둠 속 한 줄기 빛 확장 인터랙션 */}
       <LightMetaphorSection />
@@ -195,7 +201,8 @@ function MagazinePage() {
           {
             lines: [
               '인간 내부에 깃든 힘은 본래 새롭다.',
-              '그 새로움 때문에 인간은 자신이 무엇을 할 수 있는지 예상하지 못하는데,',
+              '그 새로움 때문에 인간은',
+              '자신이 무엇을 할 수 있는지 예상하지 못하는데,',
               '직접 뭔가를 해보아야만 비로소 자기 능력을 알게 된다.',
             ],
             delay: 2000,
@@ -219,20 +226,23 @@ function MagazinePage() {
             lines: [
               '인상이 기억 속에 각인되는 것은',
               '사전에 정해진 조화를 따르기 때문이다.',
-              '우리 눈은 빛이 있는 곳을 바라보고 특정한 빛을 인식한다.',
+              '우리 눈은 빛이 있는 곳을 바라보고',
+              '특정한 빛을 인식한다.',
             ],
             delay: 2000,
           },
           {
             lines: [
-              '그런데 우리는 자기 생각을 절반도 옳게 드러내지 못하고,',
-              '각자가 마음속에 품고 있는 신성한 생각을 오히려 부끄럽게 여긴다.',
+              '그런데 우리는 자기 생각을',
+              '절반도 옳게 드러내지 못하고,',
+              '각자가 마음속에 품고 있는 신성한 생각을',
+              '오히려 부끄럽게 여긴다.',
+            ],
+            delay: 2000,
+          },
+          {
+            lines: [
               '하지만 부끄러워하지 말라.',
-            ],
-            delay: 2000,
-          },
-          {
-            lines: [
               '그 신성한 생각은 자기 형편에 알맞고',
               '확실히 좋은 결과를 가져올 것이기에',
               '충실하게 밖으로 표현해야 마땅하다.',
@@ -410,16 +420,38 @@ function MagazinePage() {
             ],
             delay: 2000,
           },
-          {
-            lines: [
-              '"꾸준히 버티면서 묵묵히 자기 일을 해나가는 자에게',
-              '축복의 신들은 재빨리 도움의 손길을 뻗는다."',
-            ],
-            delay: 2000,
-            isHighlight: true,
-          },
         ] }
       />
+
+      {/* 클로징 인용 — 조로아스터 */}
+      <Box
+        sx={ {
+          minHeight: '100svh',
+          position: 'relative',
+          zIndex: 3,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: { xs: 3, md: 6 },
+        } }
+      >
+        <Typography
+          variant="h4"
+          sx={ {
+            fontFamily: '"Noto Serif KR", serif',
+            fontWeight: 600,
+            fontSize: { xs: '1.14rem', md: '1.32rem' },
+            color: 'primary.main',
+            textAlign: 'center',
+            lineHeight: 2,
+            wordBreak: 'keep-all',
+          } }
+        >
+          &ldquo;꾸준히 버티면서 묵묵히 자기 일을 해나가는 자에게
+          <br />
+          축복의 신들은 재빨리 도움의 손길을 뻗는다.&rdquo;
+        </Typography>
+      </Box>
 
       {/* 출처 안내 */}
       <Box

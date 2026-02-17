@@ -259,16 +259,6 @@ function ArticleSection({ title, bodyBlocks = [], sx }) {
             gap: 1,
           } }
         >
-          <Typography
-            variant="body2"
-            sx={ {
-              color: 'rgba(245, 242, 238, 0.4)',
-              fontSize: '0.85rem',
-              letterSpacing: '0.08em',
-            } }
-          >
-            다음으로
-          </Typography>
           <Box
             component="svg"
             xmlns="http://www.w3.org/2000/svg"

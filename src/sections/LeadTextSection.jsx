@@ -94,6 +94,7 @@ function LeadHeadlineSection({ headline, sx }) {
       sx={ {
         height: '200svh',
         position: 'relative',
+        zIndex: 2,
         ...sx,
       } }
     >
@@ -130,7 +131,7 @@ function LeadHeadlineSection({ headline, sx }) {
                 fontWeight: 400,
                 textAlign: 'center',
                 fontSize: { xs: '1.04rem', md: '1.28rem' },
-                color: '#F5F2EE',
+                color: '#12100E',
                 letterSpacing: '0.02em',
               } }
             />
@@ -141,7 +142,7 @@ function LeadHeadlineSection({ headline, sx }) {
             sx={ {
               width: isVisible ? '100%' : '0%',
               height: '1px',
-              backgroundColor: 'rgba(245, 242, 238, 0.3)',
+              backgroundColor: 'rgba(18, 16, 14, 0.3)',
               transition: 'width 1s ease-out',
               mt: 4,
             } }
@@ -185,7 +186,7 @@ function LeadTextSection({ text, sx }) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          contentRef.current.style.color = 'rgba(245, 242, 238, 0.85)';
+          contentRef.current.style.color = 'rgba(18, 16, 14, 0.85)';
           observer.disconnect();
         }
       },
@@ -202,6 +203,7 @@ function LeadTextSection({ text, sx }) {
       sx={ {
         height: '200svh',
         position: 'relative',
+        zIndex: 2,
         ...sx,
       } }
     >
@@ -225,7 +227,7 @@ function LeadTextSection({ text, sx }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            color: 'rgba(245, 242, 238, 0.12)',
+            color: 'rgba(18, 16, 14, 0.08)',
             transition: 'color 1.5s ease-out',
           } }
         >
@@ -247,6 +249,25 @@ function LeadTextSection({ text, sx }) {
                 { paragraph }
               </Typography>
             )) }
+          </Box>
+
+          {/* 하단 주석 */}
+          <Box sx={ { mt: 8, maxWidth: 520 } }>
+            <Typography
+              variant="caption"
+              sx={ {
+                color: 'rgba(18, 16, 14, 0.35)',
+                fontSize: { xs: '0.65rem', md: '0.7rem' },
+                lineHeight: 1.8,
+                wordBreak: 'keep-all',
+                textAlign: 'center',
+                display: 'block',
+              } }
+            >
+              *본 웹사이트에 수록된 텍스트는 해당 도서의 본문 일부를 발췌한 내용입니다.
+              <br />
+              *각 페이지 상단의 타이틀을 제외한 본문은 원서의 내용을 그대로 인용하였음을 밝힙니다.
+            </Typography>
           </Box>
         </Container>
       </Box>
