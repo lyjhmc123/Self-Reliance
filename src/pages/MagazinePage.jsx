@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import HeroSection from '../sections/HeroSection';
 import LeadTextSection, { LeadHeadlineSection } from '../sections/LeadTextSection';
+import LightMetaphorSection from '../sections/LightMetaphorSection';
 import FooterSection from '../sections/FooterSection';
 import OutroSection from '../sections/OutroSection';
 import GradientOverlay from '../components/dynamic-color/GradientOverlay';
@@ -48,6 +49,9 @@ function MagazinePage() {
 
       {/* 리드 본문 — 다크 배경 위 리드 텍스트 */}
       <LeadTextSection text={ intro.leadText } />
+
+      {/* 핵심 메타포 — 어둠 속 한 줄기 빛 확장 인터랙션 */}
+      <LightMetaphorSection />
 
       {/* GradientOverlay 라이트 전환 트리거 — Outro 진입 전에 전환 시작 */}
       <Box ref={ outroRef } />
