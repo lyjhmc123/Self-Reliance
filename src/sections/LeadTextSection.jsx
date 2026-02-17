@@ -1,8 +1,8 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import ScrollRevealText from '../components/kinetic-typography/ScrollRevealText';
+import RandomRevealText from '../components/kinetic-typography/RandomRevealText';
 
 /**
  * 스크롤 페이드아웃 훅
@@ -55,10 +55,42 @@ function useStickyFadeOut(fadeStart = 0.3) {
  */
 function LeadHeadlineSection({ headline, sx }) {
   const { wrapperRef, stickyRef } = useStickyFadeOut(0.3);
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLineDone, setIsLineDone] = useState(false);
+
+  /** 뷰포트 진입 감지 → 선 애니메이션 시작 */
+  useEffect(() => {
+    if (!sectionRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  /** 선 애니메이션 완료(1s) 후 텍스트 reveal 시작 */
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const timer = setTimeout(() => {
+      setIsLineDone(true);
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [isVisible]);
 
   return (
     <Box
-      ref={ wrapperRef }
+      ref={ (el) => { wrapperRef.current = el; sectionRef.current = el; } }
       sx={ {
         height: '200svh',
         position: 'relative',
@@ -86,26 +118,32 @@ function LeadHeadlineSection({ headline, sx }) {
             alignItems: 'center',
           } }
         >
-          <ScrollRevealText
-            text={ headline }
-            variant="h4"
-            activeColor="#F5F2EE"
-            inactiveColor="rgba(245, 242, 238, 0.12)"
-            autoReveal
-            autoRevealDuration={ 2000 }
-            sx={ {
-              fontFamily: '"Noto Serif KR", serif',
-              fontWeight: 400,
-              textAlign: 'center',
-              fontSize: { xs: '1.3rem', md: '1.6rem' },
-              letterSpacing: '0.02em',
-              '& .MuiTypography-root': {
+          {/* 헤드라인 텍스트 — 선 완료 후 선 위에 등장 */}
+          { isLineDone && (
+            <RandomRevealText
+              text={ headline }
+              delay={ 200 }
+              stagger={ 60 }
+              variant="h4"
+              sx={ {
                 fontFamily: '"Noto Serif KR", serif',
                 fontWeight: 400,
-                fontSize: { xs: '1.3rem', md: '1.6rem' },
-                letterSpacing: '0.02em',
                 textAlign: 'center',
-              },
+                fontSize: { xs: '1.04rem', md: '1.28rem' },
+                color: '#F5F2EE',
+                letterSpacing: '0.02em',
+              } }
+            />
+          ) }
+
+          {/* 왼쪽→오른쪽 선 — 텍스트 아래 */}
+          <Box
+            sx={ {
+              width: isVisible ? '100%' : '0%',
+              height: '1px',
+              backgroundColor: 'rgba(245, 242, 238, 0.3)',
+              transition: 'width 1s ease-out',
+              mt: 4,
             } }
           />
         </Container>

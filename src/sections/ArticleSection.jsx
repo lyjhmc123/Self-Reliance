@@ -35,7 +35,7 @@ const flicker = keyframes`
  *
  * Props:
  * @param {string} title - 아티클 타이틀 [Required]
- * @param {Array<{lines: string[], delay: number}>} bodyBlocks - 본문 블록 배열. 각 블록은 lines(텍스트 줄)와 delay(이전 블록 노출 후 대기 ms) [Optional]
+ * @param {Array<{lines: string[], delay: number, isHighlight: boolean}>} bodyBlocks - 본문 블록 배열. lines(텍스트 줄), delay(이전 블록 노출 후 대기 ms), isHighlight(강조 스타일) [Optional]
  * @param {object} sx - 추가 스타일 [Optional]
  *
  * Example usage:
@@ -52,6 +52,8 @@ function ArticleSection({ title, bodyBlocks = [], sx }) {
   const [isLineDone, setIsLineDone] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [visibleBlocks, setVisibleBlocks] = useState(0);
+  const isFullyRevealed = bodyBlocks.length === 0 || visibleBlocks >= bodyBlocks.length;
+  const [isNextVisible, setIsNextVisible] = useState(false);
 
   /** 뷰포트 진입 감지 → 선 애니메이션 시작 */
   useEffect(() => {
@@ -109,6 +111,41 @@ function ArticleSection({ title, bodyBlocks = [], sx }) {
 
     return () => clearTimeout(timer);
   }, [visibleBlocks, bodyBlocks]);
+
+  /** 마지막 블록 노출 2초 후 '다음으로' 표시 */
+  useEffect(() => {
+    if (!isFullyRevealed || bodyBlocks.length === 0) return;
+
+    const timer = setTimeout(() => {
+      setIsNextVisible(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [isFullyRevealed, bodyBlocks.length]);
+
+  /** 본문이 모두 드러나기 전까지 스크롤 잠금 */
+  useEffect(() => {
+    if (!isVisible || isFullyRevealed) return;
+
+    /** 섹션을 뷰포트에 스냅 */
+    if (sectionRef.current) {
+      sectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /** 스냅 완료 후 사용자 스크롤 입력 차단 */
+    const prevent = (e) => e.preventDefault();
+
+    const timer = setTimeout(() => {
+      window.addEventListener('wheel', prevent, { passive: false });
+      window.addEventListener('touchmove', prevent, { passive: false });
+    }, 800);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('wheel', prevent);
+      window.removeEventListener('touchmove', prevent);
+    };
+  }, [isVisible, isFullyRevealed]);
 
   return (
     <Box
@@ -193,9 +230,13 @@ function ArticleSection({ title, bodyBlocks = [], sx }) {
                 variant="body1"
                 sx={ {
                   fontFamily: '"Noto Serif KR", serif',
-                  fontWeight: 300,
-                  fontSize: { xs: '0.95rem', md: '1.1rem' },
-                  color: 'rgba(245, 242, 238, 0.85)',
+                  fontWeight: block.isHighlight ? 600 : 300,
+                  fontSize: block.isHighlight
+                    ? { xs: '1.14rem', md: '1.32rem' }
+                    : { xs: '0.95rem', md: '1.1rem' },
+                  color: block.isHighlight
+                    ? 'primary.main'
+                    : 'rgba(245, 242, 238, 0.85)',
                   lineHeight: 2,
                   wordBreak: 'keep-all',
                 } }
@@ -205,6 +246,43 @@ function ArticleSection({ title, bodyBlocks = [], sx }) {
             )) }
           </Box>
         )) }
+
+        {/* 다음으로 — 마지막 블록 노출 2초 후 등장 */}
+        <Box
+          sx={ {
+            opacity: isNextVisible ? 1 : 0,
+            transition: 'opacity 1.5s ease-out',
+            mt: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+          } }
+        >
+          <Typography
+            variant="body2"
+            sx={ {
+              color: 'rgba(245, 242, 238, 0.4)',
+              fontSize: '0.85rem',
+              letterSpacing: '0.08em',
+            } }
+          >
+            다음으로
+          </Typography>
+          <Box
+            component="svg"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(245, 242, 238, 0.4)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            sx={ { width: 16, height: 16 } }
+          >
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </Box>
+        </Box>
       </Container>
     </Box>
   );

@@ -409,7 +409,7 @@ const magazineData = {
     logo: 'Intertext',
     instagramHandle: '@inter._text',
     instagramUrl: 'https://instagram.com/inter._text',
-    copyright: '© 2024 Intertext Magazine. All rights reserved.',
+    copyright: '© 2026 Intertext. All rights reserved.',
   },
 };
 
