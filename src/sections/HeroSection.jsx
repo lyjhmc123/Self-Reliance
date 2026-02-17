@@ -60,6 +60,19 @@ function HeroSection({
         ...sx,
       } }
     >
+      {/* 테두리 프레임 */}
+      <Box
+        sx={ {
+          position: 'absolute',
+          top: { xs: 16, md: 24 },
+          left: { xs: 16, md: 24 },
+          right: { xs: 16, md: 24 },
+          bottom: { xs: 16, md: 24 },
+          border: '1px solid rgba(18, 16, 14, 0.1)',
+          pointerEvents: 'none',
+        } }
+      />
+
       {/* 히어로 텍스트 영역 */}
       <Container
         maxWidth="md"
