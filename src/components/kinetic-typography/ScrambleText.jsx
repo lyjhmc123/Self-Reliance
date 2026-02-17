@@ -20,6 +20,7 @@ const INITIAL_CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
  * Props:
  * @param {string} text - 표시할 텍스트 [Required]
  * @param {number} duration - 스크램블 애니메이션 소요 시간 (ms) [Optional, 기본값: 800]
+ * @param {number} holdDuration - 전체 텍스트가 스크램블 상태로 유지되는 시간 (ms) [Optional, 기본값: 0]
  * @param {boolean} isTrigger - 애니메이션 트리거 여부 [Optional, 기본값: true]
  * @param {boolean} isInitialScramble - 최초 마운트 시 스크램블 효과 여부 [Optional, 기본값: false]
  * @param {string} initialCharset - 최초 등장 스크램블에 사용할 문자 집합 [Optional, 기본값: '!@#$%^&*()_+-=[]{}|;:,.<>?/~`']
@@ -30,10 +31,12 @@ const INITIAL_CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
  * Example usage:
  * <ScrambleText text="Hello World" duration={1000} />
  * <ScrambleText text="Design" isInitialScramble initialCharset="※◆●▲■" />
+ * <ScrambleText text="Hold" isInitialScramble holdDuration={500} />
  */
 function ScrambleText({
   text,
   duration = 800,
+  holdDuration = 0,
   isTrigger = true,
   isInitialScramble = false,
   initialCharset = INITIAL_CHARS,
@@ -56,7 +59,11 @@ function ScrambleText({
 
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+
+      /** holdDuration 동안 전체 텍스트가 스크램블 상태로 유지 */
+      const settlingElapsed = Math.max(0, elapsed - holdDuration);
+      const progress = Math.min(settlingElapsed / duration, 1);
+      const totalDuration = holdDuration + duration;
 
       /** 왼쪽부터 순차적으로 글자 확정 */
       const settledCount = Math.floor(progress * targetText.length);
@@ -72,7 +79,7 @@ function ScrambleText({
 
       setDisplayText(result);
 
-      if (progress < 1) {
+      if (elapsed < totalDuration) {
         frameRef.current = requestAnimationFrame(animate);
       } else {
         setDisplayText(targetText);

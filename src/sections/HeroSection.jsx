@@ -7,32 +7,32 @@ import RandomRevealText from '../components/kinetic-typography/RandomRevealText'
  * HeroSection 컴포넌트
  *
  * 매거진 표지 역할의 전체화면 히어로 섹션.
- * 라이트 배경(Wall Tint White #F5F2EE) 위에 로고, 서브타이틀, 타이틀을 수직 배치.
+ * 라이트 배경(Wall Tint White #F5F2EE) 위에 로고, 타이틀, 저자 정보를 수직 배치.
  *
  * 동작 흐름:
  * 1. 사용자가 페이지에 진입하면 100vh 크기의 표지가 표시된다
- * 2. 상단에 로고, 중앙에 서브타이틀·타이틀이 수직 정렬된다
+ * 2. 상단에 로고, 중앙에 타이틀과 저자 정보가 수직 정렬된다
  * 3. 하단에 스크롤 안내 텍스트가 표시된다
  * 4. 스크롤하면 다음 섹션(LeadTextSection)으로 자연스럽게 전환된다
  *
  * Props:
  * @param {string} logo - 매거진 로고 텍스트 [Required]
- * @param {string} subtitle - 서브타이틀 텍스트 [Required]
  * @param {string} title - 메인 타이틀 텍스트 [Required]
+ * @param {string} authorInfo - 저자 및 출판사 정보 [Optional]
  * @param {string} footerText - 하단 스크롤 안내 텍스트 [Optional, 기본값: 'Scroll to explore']
  * @param {object} sx - 추가 스타일 [Optional]
  *
  * Example usage:
  * <HeroSection
- *   logo="Intertext"
- *   subtitle="Intertext issue no.1"
- *   title="Reality Transurfing"
+ *   logo="by Intertext"
+ *   title="자기 신뢰"
+ *   authorInfo="랄프 왈도 에머슨, 현대지성"
  * />
  */
 function HeroSection({
   logo,
-  subtitle,
   title,
+  authorInfo,
   footerText = 'Scroll to explore',
   sx,
 }) {
@@ -83,32 +83,54 @@ function HeroSection({
             textAlign: 'center',
           } }
         >
-          {/* 서브타이틀 */}
-          <Typography
-            variant="overline"
+          {/* 타이틀 상단 캐치프레이즈 — RandomRevealText로 등장 */}
+          <RandomRevealText
+            text="인생의 모든 답은 내 안에 있다"
+            variant="h3"
+            delay={ 200 }
+            stagger={ 40 }
             sx={ {
+              fontFamily: '"Noto Serif KR", serif',
+              fontSize: { xs: '1.1rem', sm: '1.4rem', md: '2rem' },
+              fontWeight: 400,
               color: 'rgba(18, 16, 14, 0.5)',
+              letterSpacing: '0.045em',
               mb: 2,
             } }
-          >
-            { subtitle }
-          </Typography>
+          />
 
-          {/* 메인 타이틀 — 글자가 랜덤 순서로 blur에서 나타남 */}
+          {/* 메인 타이틀 — 캐치프레이즈 후 RandomRevealText로 등장 */}
           <RandomRevealText
             text={ title }
             variant="h1"
-            delay={ 200 }
+            delay={ 1200 }
             stagger={ 60 }
             sx={ {
+              fontFamily: '"Noto Serif KR", serif',
               fontSize: { xs: '3.5rem', sm: '4.5rem', md: '7rem' },
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
               color: '#12100E',
-              mb: { xs: 4, md: 6 },
+              mb: '40px',
               display: 'block',
             } }
           />
+
+          {/* 저자 정보 — 타이틀 후 RandomRevealText로 등장 */}
+          { authorInfo && (
+            <RandomRevealText
+              text={ authorInfo }
+              variant="caption"
+              delay={ 2000 }
+              stagger={ 40 }
+              sx={ {
+                fontFamily: '"Noto Serif KR", serif',
+                fontSize: '0.9rem',
+                color: 'rgba(18, 16, 14, 0.5)',
+                letterSpacing: '0.05em',
+              } }
+            />
+          ) }
 
         </Box>
 

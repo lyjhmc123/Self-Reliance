@@ -44,8 +44,8 @@ function MagazinePage() {
       {/* 사이트 진입 — 라이트 영역 */}
       <HeroSection
         logo={ intro.logo }
-        subtitle={ intro.subtitle }
         title={ intro.title }
+        authorInfo={ intro.authorInfo }
         footerText={ intro.footerText }
       />
 

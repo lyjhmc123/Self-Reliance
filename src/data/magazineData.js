@@ -23,9 +23,9 @@ const magazineData = {
   // 1. Intro
   // ─────────────────────────────────────
   intro: {
-    logo: 'Intertext',
-    subtitle: 'Intertext issue no.1',
-    title: 'Reality Transurfing',
+    logo: 'by Intertext',
+    title: '자기 신뢰',
+    authorInfo: '랄프 왈도 에머슨, 현대지성',
     leadText: '리얼리티 트랜서핑(Reality Transurfing)은 러시아의 작가 바딤 젤란드가 제시한 현실 인식 및 자기계발 이론입니다. 이 이론은 현실을 단일한 결과가 아닌, 무한한 가능성의 집합으로 바라보며 개인은 그중 하나의 시나리오를 선택하며 살아간다는 관점을 제시합니다. 인터텍스트 매거진은 이 텍스트를 자기계발 이론이 아니라, 하나의 사유해볼 대상으로 다룹니다. 본 호에서는 트랜서핑의 주요 개념들이 이야기하고 있는 세계관이 무엇인지, 그리고 이 세계관을 현실에 적용했을 때 어떤 삶의 변화가 발생하는지에 주목합니다.',
     footerText: 'Scroll to explore',
   },
