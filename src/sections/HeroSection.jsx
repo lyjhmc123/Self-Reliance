@@ -1,7 +1,20 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { keyframes } from '@mui/material/styles';
 import RandomRevealText from '../components/kinetic-typography/RandomRevealText';
+import selfImage from '../assets/self.jpg';
+
+const floatUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 /**
  * HeroSection 컴포넌트
@@ -148,6 +161,22 @@ function HeroSection({
           { footerText }
         </Typography>
       </Container>
+
+      {/* 우하단 책 표지 이미지 — 서브타이틀 등장 후 부드럽게 떠오름 */}
+      <Box
+        component="img"
+        src={ selfImage }
+        alt="자기 신뢰 표지"
+        sx={ {
+          position: 'absolute',
+          bottom: { xs: '10%', md: '12%' },
+          right: { xs: '6%', md: '8%' },
+          width: { xs: 100, sm: 120, md: 150 },
+          opacity: 0,
+          animation: `${floatUp} 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 2.8s forwards`,
+          boxShadow: '0 8px 32px rgba(18, 16, 14, 0.12)',
+        } }
+      />
 
       {/* 커버 이미지 — 히어로 하단에서 시작해 다음 섹션까지 걸침 */}
       {/* <Box
