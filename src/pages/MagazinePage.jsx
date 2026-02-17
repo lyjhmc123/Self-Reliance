@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import HeroSection from '../sections/HeroSection';
 import LeadTextSection, { LeadHeadlineSection } from '../sections/LeadTextSection';
 import LightMetaphorSection from '../sections/LightMetaphorSection';
+import ArticleSection from '../sections/ArticleSection';
 import FooterSection from '../sections/FooterSection';
 import OutroSection from '../sections/OutroSection';
 import GradientOverlay from '../components/dynamic-color/GradientOverlay';
@@ -52,6 +53,36 @@ function MagazinePage() {
 
       {/* 핵심 메타포 — 어둠 속 한 줄기 빛 확장 인터랙션 */}
       <LightMetaphorSection />
+
+      {/* 아티클 — 타이틀 + 본문 */}
+      <ArticleSection
+        title="당신 안의 진실"
+        bodyBlocks={ [
+          {
+            lines: [
+              '당신 자신의 생각을 믿는 것,',
+              '은밀한 마음속에서 당신이 진실이라고 생각하는 것이',
+              '모든 사람에게도 그대로 진실이 된다고 믿는 것,',
+              '이것이 천재의 행동이다.',
+            ],
+            delay: 0,
+          },
+          {
+            lines: [
+              '당신의 머릿속에 숨은 확신을',
+              '밖으로 드러내면 보편적 의미를 획득한다.',
+            ],
+            delay: 2000,
+          },
+          {
+            lines: [
+              '가장 깊숙한 것은',
+              '적절한 때가 되면 겉으로 분명하게 드러나기 때문이다.',
+            ],
+            delay: 2000,
+          },
+        ] }
+      />
 
       {/* GradientOverlay 라이트 전환 트리거 — Outro 진입 전에 전환 시작 */}
       <Box ref={ outroRef } />
