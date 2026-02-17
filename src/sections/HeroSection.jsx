@@ -94,6 +94,7 @@ function HeroSection({
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
+            mt: '-10vh',
           } }
         >
           {/* 타이틀 상단 캐치프레이즈 — RandomRevealText로 등장 */}
@@ -169,7 +170,7 @@ function HeroSection({
         alt="자기 신뢰 표지"
         sx={ {
           position: 'absolute',
-          bottom: { xs: '10%', md: '12%' },
+          bottom: { xs: '18%', md: '20%' },
           right: { xs: '6%', md: '8%' },
           width: { xs: 100, sm: 120, md: 150 },
           opacity: 0,
